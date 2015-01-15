@@ -1,3 +1,4 @@
+import math
 #the program assumes that the last field of the turple is the output.
 
 def calcInfoGain(data, index,numOfAtt):
@@ -9,7 +10,11 @@ def calcInfoGain(data, index,numOfAtt):
 			t+=1
 		else:
 			f+=1
+	t = float(t)/len(data)
+	f = float(f)/len(data)
 	print t, f
+	H = -(t*math.log(t,2))-(f*math.log(f,2))
+	print H
 	maxIG = 0
 	data.sort(key=lambda tup:tup[index])
 	for i in range(1,len(data)):
