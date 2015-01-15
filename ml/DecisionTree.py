@@ -1,5 +1,9 @@
+#the program assumes that the last field of the turple is the output.
+
 def calcInfoGain(data, index):
-	#discrete or continuous
+	#discrete or continuous, assume continuous for now
+	data.sort(key=lambda tup:tup[i])
+	print data
 
 def buildTree(data, numOfAtt,attRec):
 	#record of attribute used
@@ -21,7 +25,7 @@ def main():
 	
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	main()
 
 
