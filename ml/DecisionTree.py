@@ -1,15 +1,17 @@
 import math
 #the program assumes that the last field of the turple is the output.
 
-def calcInfoGain(data, index,numOfAtt):
+def calcInfoGain(data, index,resultIndex):
 	#discrete or continuous, assume continuous for now
 	#calculate H(D)
 	t = f = 0
 	for d in data:
-		if(d[numOfAtt] is True):
+		if(d[resultIndex] is True):
 			t+=1
 		else:
 			f+=1
+	left = (0,0)
+	right = (t,f)
 	t = float(t)/len(data)
 	f = float(f)/len(data)
 	print t, f
@@ -19,7 +21,12 @@ def calcInfoGain(data, index,numOfAtt):
 	data.sort(key=lambda tup:tup[index])
 	for i in range(1,len(data)):
 		if(data[i-1][index] == data[i][index]):
+			if(data[i][resultIndex] is True):
+			left = (left[0] + 1, left[1])
+			right = (right[0] - 1, right[1])
 			continue;
+		threshold = (data[i][index] + data[i-1][index]) / float(2)
+		print threshold
 
 
 def buildTree(data, numOfAtt,attRec):
