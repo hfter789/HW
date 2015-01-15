@@ -1,32 +1,40 @@
 #the program assumes that the last field of the turple is the output.
 
-def calcInfoGain(data, index):
+def calcInfoGain(data, index,numOfAtt):
 	#discrete or continuous, assume continuous for now
-	data.sort(key=lambda tup:tup[i])
-	print data
+	#calculate H(D)
+	t = f = 0
+	for d in data:
+		if(d[numOfAtt] is True):
+			t+=1
+		else:
+			f+=1
+	print t, f
+	maxIG = 0
+	data.sort(key=lambda tup:tup[index])
+	for i in range(1,len(data)):
+		if(data[i-1][index] == data[i][index]):
+			continue;
+
 
 def buildTree(data, numOfAtt,attRec):
 	#record of attribute used
 	infoGains = dict()
+	root = dict()
 	for i in range(numOfAtt):
 		if i in attRec:
 			continue;
 		#calculate each individual attributes.
-		calcInfoGain(data,i)
+		calcInfoGain(data,i,numOfAtt)
 
 
 def main():
-	ages = [24, 53,23,25,32,52,22,43,52,48]
+	ages = [24,53,23,25,32,52,22,43,52,48]
 	salaries = [40000,52000,25000,77000,48000,110000,38000,44000,27000,65000]
 	degrees = [True, False, False, True, True, True, True, False,False,True]
 	data = zip(ages,salaries,degrees)
 
-	root = buildTree(data,2,set()
-	
+	root = buildTree(data,2,set())
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()
-
-
-
