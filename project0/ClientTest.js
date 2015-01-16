@@ -37,9 +37,8 @@ client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
 });
 
 message = new Buffer('C4611My KungFu is Good!');
-message[0] = 0xC4;
-message[1] = 0x61;
-message[2] = 0x01; 
+
+message = new Buffer('C4610103000001211B2D3C4A','hex');
 
 
 client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {

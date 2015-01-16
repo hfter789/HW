@@ -40,8 +40,13 @@ function processMsg(message,remote){
 	if(parseInt(msg.slice(0,2).toString('hex',0,2),16)!= MAGIC || msg[2] != VERSION){
 		return;
 	}
-	
-	console.log("pass!");
+	console.log("MAGIC and VERSION check: PASSED");
+	var cmd = msg[3];
+	var seqNum = parseInt(msg.slice(4,8).toString('hex',0,4));
+	var sesID = msg.slice(8,12).toString('hex',0,4);
+	console.log(cmd);
+	console.log(seqNum);
+	console.log(sesID);
+
 	//2)examines session id: if exist, give to that session, else, create a new session
-	//var sesID = parseInt(msg.substring());
 }
