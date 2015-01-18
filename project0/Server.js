@@ -17,7 +17,7 @@ var HOST = '127.0.0.1';
 
 //create a udp4 server
 var dgram = require('dgram');
-var server = dgram.createSocket('udp4');
+var server = dgram.createSocket('udp6');
 //sessions is a map that maps from session id to # messages the session has received
 var sessions = {};
 
@@ -28,12 +28,19 @@ process.stdin.setEncoding('utf8');
 process.stdin.on('readable', function() {
   var cmd = process.stdin.read();
   if (cmd && (cmd.toLowerCase() == "q" || cmd.toLowerCase() == "q\n")) {
-    process.stdout.write('ByeBye\n');
+  	var size = 0;
+  	for(var key in sessions){
+  		size++;
+  	}
     var count = 0;
     for (var key in sessions){
-    	console.log(key);
-    	closeSession(key);
+    	// console.log(key);
     	count++;
+    	if(count == size){
+    		closeSession(key,exit);
+    	}else{
+    		closeSession(key);
+    	}
     }
   }
 });
@@ -49,22 +56,31 @@ server.on('message', function (message, remote) {
 
 server.bind(PORT, HOST);
 
-function sendMessage(remote, command, message){
+function exit(){
+	server.close();
+    process.exit();
+}
+
+function sendMessage(remote, command, message,callback){
 	var newMessage = new Buffer(message).slice(0,MIN_LENGTH);
 	newMessage[3] = command;
 	//console.log("Length of new Message is: " + newMessage.length);
+	if(callback){
+		server.send(newMessage, 0, newMessage.length, remote.port, remote.address, callback);
+		return;
+	}
 	server.send(newMessage, 0, newMessage.length, remote.port, remote.address, function(err, bytes) {
 		if (err) throw err;
 		//console.log('UDP message sent to ' + remote.address +':'+ remote.port);
 	});
 }
 
-function closeSession(id){
+function closeSession(id,callback){
 	message = new Buffer('C461010300000000'+id,'hex');
 	var remote = sessions[id]['Address'];
 	clearTimeout(sessions[id]['Timer']);
 	//console.log(remote);
-	sendMessage(remote, 3, message);
+	sendMessage(remote, 3, message,callback);
 	delete sessions[id];
 	process.stdout.write("0x" + id  +" Session closed\n");
 }
