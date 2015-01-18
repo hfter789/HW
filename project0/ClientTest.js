@@ -57,7 +57,7 @@ client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
     console.log('UDP message sent to ' + HOST +':'+ PORT);
 });
 
-message = new Buffer('C4610101000001211B2D3C4A','hex');
+message = new Buffer('C4610101000000001B2D3C4A','hex');
 var payload = new Buffer("I'M Very Smart");
 
 message = Buffer.concat([message, payload]);
@@ -68,6 +68,17 @@ client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
     console.log('UDP message sent to ' + HOST +':'+ PORT);
 });
 
+message = new Buffer('C4610101000000021B2D3C4A','hex');
+var payload = new Buffer("I'M Very Smart Again");
+
+message = Buffer.concat([message, payload]);
+
+
+client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
+    if (err) throw err;
+    console.log('UDP message sent to ' + HOST +':'+ PORT);
+});
+/*
 message = new Buffer('C4610102000001211B2D3C4A','hex');
 
 
@@ -75,6 +86,7 @@ client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
     if (err) throw err;
     console.log('UDP message sent to ' + HOST +':'+ PORT);
 });
+*/
 
 // //goodbye
 // message = new Buffer('C4610103000001211B2D3C4A','hex');
