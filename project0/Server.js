@@ -96,7 +96,7 @@ function resetTimer(id){
 }
 
 function processMsg(message,remote){
-    //console.log(remote.address + ':' + remote.port +' - ' + message);
+    console.log(remote.address + ':' + remote.port +' - ' + message);
     //1)check magic number and version, discard msg if they don't match
 	var msg = new Buffer(message);
 	//do nothing if the header is not complete or wrong
@@ -109,13 +109,13 @@ function processMsg(message,remote){
 	var cmd = msg[3];
 	var seqNum = parseInt(msg.slice(4,8).toString('hex',0,4));
 	var sesID = msg.slice(8,12).toString('hex',0,4);
-	/*
-	console.log("Remote is :");
-	console.log(remote);
-	console.log("Command is :" + cmd);
-	console.log("Sequence Number is: "+ seqNum);
-	console.log("Session ID is :" + sesID);
-	*/
+	
+	// console.log("Remote is :");
+	// console.log(remote);
+	// console.log("Command is :" + cmd);
+	// console.log("Sequence Number is: "+ seqNum);
+	// console.log("Session ID is :" + sesID);
+	
 	//2)examines session id: if exist, give to that session, else, create a new session
 	if(!(sesID in sessions)){
 		if(cmd != 0){
