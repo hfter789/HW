@@ -1,0 +1,4 @@
+#!/bin/bash
+
+node ./node/client.js $1 $2
+

@@ -1,3 +1,4 @@
+var HELLO = 0, DATA = 1, ALIVE = 2, BYE = 3;
 /*
 	require 3 arguments, 1 is node, 2 is the file itself,
 	3 is the portnum
@@ -7,11 +8,11 @@ if(process.argv.length != 3){
 	return;
 }
 //the time that server would wait if not receiving any message from client
-var TIMEOUT = 30000
+var TIMEOUT = 30000;
 //A magic number & version number in front of the message, discard message if not present
-var MAGIC = 0xC461
-var VERSION = 1
-var MIN_LENGTH = 12 //in bytes
+var MAGIC = 0xC461;
+var VERSION = 1;
+var MIN_LENGTH = 12; //in bytes
 var PORT = process.argv[2];
 var HOST = '127.0.0.1';
 
@@ -42,6 +43,7 @@ process.stdin.on('readable', function() {
     		closeSession(key);
     	}
     }
+    process.exit();
   }
 });
 
@@ -67,11 +69,12 @@ function sendMessage(remote, command, message,callback){
 	//console.log("Length of new Message is: " + newMessage.length);
 	if(callback){
 		server.send(newMessage, 0, newMessage.length, remote.port, remote.address, callback);
+		console.log('UDP message sent to ' + remote.address +':'+ remote.port);
 		return;
 	}
 	server.send(newMessage, 0, newMessage.length, remote.port, remote.address, function(err, bytes) {
 		if (err) throw err;
-		//console.log('UDP message sent to ' + remote.address +':'+ remote.port);
+		console.log('UDP message sent to ' + remote.address +':'+ remote.port);
 	});
 }
 
@@ -80,7 +83,7 @@ function closeSession(id,callback){
 	var remote = sessions[id]['Address'];
 	clearTimeout(sessions[id]['Timer']);
 	//console.log(remote);
-	sendMessage(remote, 3, message,callback);
+	sendMessage(remote, BYE, message,callback);
 	delete sessions[id];
 	process.stdout.write("0x" + id  +" Session closed\n");
 }
@@ -110,15 +113,15 @@ function processMsg(message,remote){
 	var seqNum = parseInt(msg.slice(4,8).toString('hex',0,4));
 	var sesID = msg.slice(8,12).toString('hex',0,4);
 	
-	// console.log("Remote is :");
-	// console.log(remote);
-	// console.log("Command is :" + cmd);
-	// console.log("Sequence Number is: "+ seqNum);
-	// console.log("Session ID is :" + sesID);
+	console.log("Remote is :");
+	console.log(remote);
+	console.log("Command is :" + cmd);
+	console.log("Sequence Number is: "+ seqNum);
+	console.log("Session ID is :" + sesID);
 	
 	//2)examines session id: if exist, give to that session, else, create a new session
 	if(!(sesID in sessions)){
-		if(cmd != 0){
+		if(cmd != HELLO){
 			//console.log("Session not created.");
 			return;
 		}
@@ -131,7 +134,8 @@ function processMsg(message,remote){
 		}
 		process.stdout.write("0x" + sesID + " [" + seqNum +"] " + "Session created\n");
 		sesFields['SeqNum'] = seqNum;
-		return;
+		sendMessage(remote,HELLO,message);
+		return
 	}else{
 		resetTimer(sesID);
 	}
@@ -152,19 +156,17 @@ function processMsg(message,remote){
 
 	sessions[sesID]['SeqNum'] = seqNum;
 
-	if(cmd == 0){
-		sendMessage(remote,0,message);
-	}else if(cmd == 1){
+	if(cmd == DATA){
 		// console.log("DATA");
 		//slice the message to get the payload.
 		//payload is everything from the end of header to the end of msg
 		var payload = msg.slice(MIN_LENGTH, msg.length);
 		process.stdout.write("0x" + sesID + " [" + seqNum +"] " + payload +"\n");
-		sendMessage(remote,2,msg);
-	}else if(cmd == 2){
+		sendMessage(remote,ALIVE,msg);
+	}else if(cmd == ALIVE){
 		// console.log("ALIVE");
 		resetTimer(sesID);
-	}else if(cmd == 3){
+	}else if(cmd == BYE){
 		//console.log("GOODBYE");
 		closeSession(sesID);
 	}else{
