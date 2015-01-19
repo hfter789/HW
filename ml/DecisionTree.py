@@ -22,9 +22,9 @@ def calcInfoGain(data, index,resultIndex):
 	for i in range(1,len(data)):
 		if(data[i-1][index] == data[i][index]):
 			if(data[i][resultIndex] is True):
-			left = (left[0] + 1, left[1])
-			right = (right[0] - 1, right[1])
-			continue;
+				left = (left[0] + 1, left[1])
+				right = (right[0] - 1, right[1])
+				continue;
 		threshold = (data[i][index] + data[i-1][index]) / float(2)
 		print threshold
 
