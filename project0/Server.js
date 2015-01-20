@@ -8,7 +8,7 @@ if(process.argv.length != 3){
 	return;
 }
 //the time that server would wait if not receiving any message from client
-var TIMEOUT = 30000;
+var TIMEOUT = 3000;
 //A magic number & version number in front of the message, discard message if not present
 var MAGIC = 0xC461;
 var VERSION = 1;
@@ -49,7 +49,7 @@ process.stdin.on('readable', function() {
 
 server.on('listening', function () {
     var address = server.address();
-    console.log('Waiting on port ' + address.port);
+    console.log('Waiting on port ' + address.port + "...");
 });
 
 server.on('message', function (message, remote) {
@@ -69,12 +69,12 @@ function sendMessage(remote, command, message,callback){
 	//console.log("Length of new Message is: " + newMessage.length);
 	if(callback){
 		server.send(newMessage, 0, newMessage.length, remote.port, remote.address, callback);
-		console.log('UDP message sent to ' + remote.address +':'+ remote.port);
+		// console.log('UDP message sent to ' + remote.address +':'+ remote.port);
 		return;
 	}
 	server.send(newMessage, 0, newMessage.length, remote.port, remote.address, function(err, bytes) {
 		if (err) throw err;
-		console.log('UDP message sent to ' + remote.address +':'+ remote.port);
+		// console.log('UDP message sent to ' + remote.address +':'+ remote.port);
 	});
 }
 
@@ -113,11 +113,11 @@ function processMsg(message,remote){
 	var seqNum = parseInt(msg.slice(4,8).toString('hex',0,4));
 	var sesID = msg.slice(8,12).toString('hex',0,4);
 	
-	console.log("Remote is :");
-	console.log(remote);
-	console.log("Command is :" + cmd);
-	console.log("Sequence Number is: "+ seqNum);
-	console.log("Session ID is :" + sesID);
+	// console.log("Remote is :");
+	// console.log(remote);
+	// console.log("Command is :" + cmd);
+	// console.log("Sequence Number is: "+ seqNum);
+	// console.log("Session ID is :" + sesID);
 	
 	//2)examines session id: if exist, give to that session, else, create a new session
 	if(!(sesID in sessions)){
