@@ -3,5 +3,9 @@
 2)Need some way to notify the client closed
 
 3)queue.join() blocks if I put it inside the class///If I put it in main, the thread won't wait for message
-
+	REMOVED
 4)do not always fire a timer.
+
+5)Redirecting PROBLEM:
+		a) stops at random line
+		b) bad file describer sometimes

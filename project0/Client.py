@@ -29,21 +29,17 @@ def main():
 	running = True;
 
 	while(running):
-		# try:
-		input = stdin.readline()
-		if(input == 'q' or input == 'q\n' or input ==''):
-			running = False
-			# cmdQ.put((BYE,None))
-		else:
-			#everything else is data
+		try:
+			input = stdin.readline()
+			# if(input == 'q' or input == 'q\n' or input ==''):
+			# 	running = False
+				# cmdQ.put((BYE,None))
+			# else:
+				#everything else is data
 			cmdQ.put((DATA,input))
-			print 'command added to Queue'
-		# except (KeyboardInterrupt,SystemExit):
-		# 	running = False
-		# 	cmdQ.put((BYE,None))
-		# 	t.join(2)
-		# 	print 'done'
-		# 	exit()
+				# print 'command added to Queue'
+		except (KeyboardInterrupt,SystemExit):
+			break
 	t.join(2)
 	exit()
 
@@ -59,21 +55,24 @@ class ClientThread(threading.Thread):
 		self.targetAddr = (targetHost,targetPort)
 		self.ID = base64.b16decode(hex(random.randint(0,4294967295))[2:10].zfill(8),True)
 		self.timer = None
-		self.exiting = False
 		self.socket.settimeout(1.0)
 
 	def closeClient(self, notify = False):
+		#close the client, if notify is true, client will send GOODBYE to the server
+		#and wait for response with a TIMEOUT.
+		#after that, the thread alive flag is set to false by calling clear()
+		#and timer is cancel if there is one
 		if notify and self.alive.isSet():
 			self.sendMessage(BYE,None)
 			self.recvMessage(BYE,TIMEOUT)
 		self.alive.clear()
 		if(self.timer is not None):
 			self.timer.cancel()
-		print "Finshed closeClient"
+		# print "Finshed closeClient"
 
 	def run(self):
 		while self.alive.isSet():
-			print "inloop"
+			# print "inloop"
 			try:
 				#block 0.1 sec
 				cmd = self.commandQ.get(True, 0.1)
@@ -105,9 +104,9 @@ class ClientThread(threading.Thread):
 
 		# print response[0:2].encode('hex').upper() != MAGIC
 		# print int(response[2].encode('hex')) != VERSION
-		print response.encode('hex')
+		# print response.encode('hex')
 		if (response[0:2].encode('hex').upper() != MAGIC) or (int(response[2].encode('hex')) != VERSION):
-			print "not valid"
+			# print "not valid"
 			return False;
 		resp = int(response[3].encode('hex'))
 		if (command == HELLO and int(resp) == HELLO) or (command == DATA and resp == ALIVE):
@@ -131,7 +130,7 @@ class ClientThread(threading.Thread):
 		# the # of packets sent is 4 bytes, fill the empty with 0
 		message += base64.b16decode(str(self.packetSent).zfill(8))
 		message += self.ID
-		print message.encode('hex')
+		# print message.encode('hex')
 		#append data if cmd is DATA
 		if(data and cmd == 1):
 			message += data
@@ -146,9 +145,9 @@ class ClientThread(threading.Thread):
 		self.closeClient(True)
 		# self.alive.clear()
 		self.socket.close()
-		print 'socket close'
+		# print 'socket close'
 		threading.Thread.join(self, timeout)
-		print "thread Done"
+		# print "thread Done"
 		
 
 if __name__ == '__main__':

@@ -8,7 +8,7 @@ if(process.argv.length != 3){
 	return;
 }
 //the time that server would wait if not receiving any message from client
-var TIMEOUT = 3000;
+var TIMEOUT = 30000;
 //A magic number & version number in front of the message, discard message if not present
 var MAGIC = 0xC461;
 var VERSION = 1;
@@ -99,7 +99,7 @@ function resetTimer(id){
 }
 
 function processMsg(message,remote){
-    console.log(remote.address + ':' + remote.port +' - ' + message);
+    // console.log(remote.address + ':' + remote.port +' - ' + message);
     //1)check magic number and version, discard msg if they don't match
 	var msg = new Buffer(message);
 	//do nothing if the header is not complete or wrong
@@ -157,11 +157,11 @@ function processMsg(message,remote){
 	sessions[sesID]['SeqNum'] = seqNum;
 
 	if(cmd == DATA){
-		// console.log("DATA");
+		//console.log("DATA");
 		//slice the message to get the payload.
 		//payload is everything from the end of header to the end of msg
 		var payload = msg.slice(MIN_LENGTH, msg.length);
-		process.stdout.write("0x" + sesID + " [" + seqNum +"] " + payload +"\n");
+		process.stdout.write("0x" + sesID + " [" + seqNum +"] " + payload );
 		sendMessage(remote,ALIVE,msg);
 	}else if(cmd == ALIVE){
 		// console.log("ALIVE");
