@@ -9,15 +9,15 @@ def CalcInfoGain(data,attIndex,resultIndex,thresholdIndex):
 			f+=1
 	t = float(t)/len(data)
 	f = float(f)/len(data)
-	print t, f
+	#print t, f
 	H = 0
 	if t > 0:
 		H -= (t*math.log(t,2))
 	if f > 0:
 		H -= (f*math.log(f,2))
-	print H
+	#print H
 	data.sort(key=lambda tup: tup[attIndex])
-	print data
+	#print data
 	threshold = float(data[thresholdIndex][attIndex] + data[thresholdIndex-1][attIndex])/2
 	left = (0,0)
 	right = (0,0)
@@ -32,33 +32,38 @@ def CalcInfoGain(data,attIndex,resultIndex,thresholdIndex):
 				right = (right[0] + 1, right[1])
 			else:
 				right = (right[0], right[1]+1)
-	print "Left has: ", left
-	print "Right has: ", right
-	Pt = float(sum(left))/(sum(left)+sum(right))
-	Pf = float(sum(right))/(sum(left)+sum(right))
+	#print "Left has: ", left
+	#print "Right has: ", right
+	Pt = -float(sum(left))/(sum(left)+sum(right))
+	Pf = -float(sum(right))/(sum(left)+sum(right))
 	HYX = 0
 	Vt = 0
 	if sum(left) != 0:
 		if(left[0] != 0):
-			Vt += float(left[0])/sum(left) * math.log(float(left[0])/sum(left))
+			Vt += float(left[0])/sum(left) * math.log(float(left[0])/sum(left),2)
 		if (left[1] != 0): 
-			float(left[1])/sum(left) * math.log(float(left[1])/sum(left))
+			Vt += float(left[1])/sum(left) * math.log(float(left[1])/sum(left),2)
 	HYX=Pt*Vt
+	Vt = 0
 	if sum(right) != 0:
 		if (right[0] != 0):
-			Vt += float(right[0])/sum(right) * math.log(float(right[0])/sum(right))
+			Vt += float(right[0])/sum(right) * math.log(float(right[0])/sum(right),2)
 		if (right[1] != 0):
-			float(right[1])/sum(right) * math.log(float(right[1])/sum(right))
+			Vt += float(right[1])/sum(right) * math.log(float(right[1])/sum(right),2)
 	HYX += Pf*Vt
-	print "IG is: ", (H - HYX)
+	print "Threshold is: ", threshold, "IG is: ", (H - HYX)
 	return (H - HYX)
 
 def main():
-	ages = [24,53,23,25,32,52,22,43,52,48]
-	salaries = [40000,52000,25000,77000,48000,110000,38000,44000,27000,65000]
-	degrees = [True, False, False, True, True, True, True, False,False,True]
+	ages = [24,53,25,32,52,22,43,48]
+	salaries = [40000,52000,77000,48000,110000,38000,44000,65000]
+	degrees = [True, False,  True, True, True, True, False,True]
 	data = zip(ages,salaries,degrees)
 	return data
+
+def c(age, money):
+	result = -float(1)/10*age+float(money)/10000-1
+	print result
 
 if __name__ == '__main__':
  	data = main()
