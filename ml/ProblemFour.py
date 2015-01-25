@@ -3,11 +3,87 @@ import scipy.sparse as sp
 import scipy.sparse.linalg as spla
 from scipy.sparse import vstack, hstack
 from math import sqrt
-
 def calcRMSE(prediction,result):
 	RMSE = sqrt(sum((prediction - result)**2)/len(prediction))
 	# print RMSE
 	return RMSE
+
+def crossVald(folding):
+	trainingData = A[:5000]
+	trainingResult = y[:5000]
+
+	testData = A[5000:]
+	testResult = y[5000:]
+
+
+	mul = len(trainingResult)/folding
+	folds = {}
+	foldsResult = {}
+	#split the data
+	for i in range(folding):
+		folds[i] = trainingData[(i*mul):((i+1)*mul)]
+		foldsResult[i] = trainingResult[(i*mul):((i+1)*mul)]
+
+	#assemble the data
+	iden = sp.identity(99)
+
+	indptr = range(100)
+	indices = [0]*99
+	data = [0] * 99
+
+	addon = sp.csc_matrix( (data,indices,indptr), shape=(1,99), dtype=float)
+	iden = vstack([addon,iden])
+	indptr = [0,1]
+	indices = range(100)
+	data = [0] * 100
+
+	addon = sp.csc_matrix( (data,indices,indptr), shape=(100,1), dtype=float)
+	iden = hstack([addon,iden])
+	l = {}
+	for i in range(folding):
+		print "#############################Using ", i, "th folds#################################"
+		tuningData = folds[i]
+		tuningResult = foldsResult[i]
+		H = t = None
+		for j in range(folding):
+			if(j != i):
+				if(H is None):
+					H = folds[j]
+					t = foldsResult[j]
+				else:	
+					H = vstack([H,folds[j]])
+					t = numpy.concatenate((t,foldsResult[j]))
+		#calculate w
+		lamda = 1.0
+		factor = 0.75
+		#decrease lambda by 25% each time for 20 times
+		for i in range(20):
+			# print "Using lamda = ", lamda
+			# print lamda
+			w = spla.inv(H.transpose()*H + lamda * iden) * H.transpose() * t
+			trainingPred = trainingData * w
+			valid = tuningData * w
+			if lamda in l:
+				l[lamda] += calcRMSE(valid,tuningResult)
+			else:
+				l[lamda] = calcRMSE(valid,tuningResult)
+
+			print  calcRMSE(trainingPred,trainingResult)
+			# print "Training RMSE ", calcRMSE(trainingPred,trainingResult)
+			# print "Validation RMSE ", calcRMSE(valid,tuningResult)
+			lamda*= factor
+
+	#find lambda that generates minimum RMSE in the tuning data
+	minRMSE = 1000
+	minL = 0
+	for x in l:
+		if l[x] < minRMSE:
+			minRMSE = l[x]
+			minL = x
+	print minL, minRMSE
+	w = spla.inv(trainingData.transpose()*trainingData + minL * iden) * trainingData.transpose() * trainingResult
+	testPred = testData * w
+	print "Testing RMSE is",calcRMSE(testPred,testResult)
 
 y = numpy.loadtxt("upvote_labels.txt", dtype=numpy.int)
 featureNames = open("upvote_features_100.txt").read().splitlines()
@@ -49,59 +125,7 @@ print "Part 1 Testing RMSE: ", calcRMSE(prediction,testResult)
 
 ###############################Part 2 ##################################
 
-trainingData = A[:5000]
-trainingResult = y[:5000]
-
-lamda = 1.0
-folding = 5
-folds = {}
-foldsResult = {}
-#split the data
-for i in range(folding):
-	folds[i] = trainingData[(i*1000):((i+1)*1000)]
-	foldsResult[i] = trainingResult[(i*1000):((i+1)*1000)]
-
-#assemble the data
-iden = sp.identity(99)
-
-indptr = range(100)
-indices = [0]*99
-data = [0] * 99
-
-addon = sp.csc_matrix( (data,indices,indptr), shape=(1,99), dtype=float)
-iden = vstack([addon,iden])
-indptr = [0,1]
-indices = range(100)
-data = [0] * 100
-
-addon = sp.csc_matrix( (data,indices,indptr), shape=(100,1), dtype=float)
-iden = hstack([addon,iden])
-
-for i in range(folding):
-	print "#############################Using ", i, "th folds#################################"
-	tuningData = folds[i]
-	tuningResult = foldsResult[i]
-	H = t = None
-	for j in range(folding):
-		if(j != i):
-			if(H is None):
-				H = folds[j]
-				t = foldsResult[j]
-			else:	
-				H = vstack([H,folds[j]])
-				t = numpy.concatenate((t,foldsResult[j]))
-	#calculate w
-	lamda = 1.0
-	factor = 0.75
-	for i in range(20):
-		# print "Using lamda = ", lamda
-		print lamda
-		w = spla.inv(H.transpose()*H + lamda * iden) * H.transpose() * t
-		trainingPred = trainingData * w
-		valid = tuningData * w
-		print calcRMSE(trainingPred,trainingResult)
-		# print "Training RMSE ", calcRMSE(trainingPred,trainingResult)
-		# print "Validation RMSE ", calcRMSE(valid,tuningResult)
-		lamda*= factor
+crossVald(5)
+# crossVald(10)
 
 
