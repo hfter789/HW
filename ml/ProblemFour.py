@@ -40,7 +40,7 @@ def crossVald(folding):
 	addon = sp.csc_matrix( (data,indices,indptr), shape=(100,1), dtype=float)
 	iden = hstack([addon,iden])
 	l = {}
-	for i in range(folding):
+	for i in range(4,5):
 		print "#############################Using ", i, "th folds#################################"
 		tuningData = folds[i]
 		tuningResult = foldsResult[i]
