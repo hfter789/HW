@@ -1,16 +1,16 @@
 1)
-	Training RMSE:  2.87606426404
+	Training RMSE:  2.87631708961
 	Testing RMSE:  2.98110717687
 
 2)
 	The optimal lambda is 0.00751694681821. I add up all the RMSE of the same lambda for different folds. And the sum of the RMSE is the least when lambda is the above value.
 
-	RMSE for test set is 2.35590347362
+	RMSE for test set is 2.35387628041
 
 3)
 	The optimal lambda is 0.0422351360321 using the same procesure as above.
 
-	RMSE for test set is 2.35359822153
+	RMSE for test set is 2.3518483114
 
 4)	Without cross-validation, the optimal lambda is 0.421875
 

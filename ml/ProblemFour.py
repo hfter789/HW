@@ -14,9 +14,17 @@ def crossVald(folding):
 
 	testData = A[5000:]
 	testResult = y[5000:]
-
-
 	mul = len(trainingResult)/folding
+
+	#add a column to the test data
+	row = range(1000)
+	col = [0] * 1000
+	data = [1] * 1000
+
+	addon = sp.csc_matrix( (data,(row,col)), shape=(1000,1), dtype=float)
+	testData = hstack([addon, testData])
+
+
 	folds = {}
 	foldsResult = {}
 	#split the data
@@ -24,23 +32,31 @@ def crossVald(folding):
 		folds[i] = trainingData[(i*mul):((i+1)*mul)]
 		foldsResult[i] = trainingResult[(i*mul):((i+1)*mul)]
 
+	row = range(5000)
+	col = [0] * 5000
+	data = [1] * 5000
+
+	addon = sp.csc_matrix( (data,(row,col)), shape=(5000,1), dtype=float)
+	trainingData = A[:5000]
+	trainingData = hstack([addon, trainingData])
+
 	#assemble the data
-	iden = sp.identity(99)
+	iden = sp.identity(100)
 
-	indptr = range(100)
-	indices = [0]*99
-	data = [0] * 99
-
-	addon = sp.csc_matrix( (data,indices,indptr), shape=(1,99), dtype=float)
-	iden = vstack([addon,iden])
-	indptr = [0,1]
-	indices = range(100)
+	indptr = range(101)
+	indices = [0]*100
 	data = [0] * 100
 
-	addon = sp.csc_matrix( (data,indices,indptr), shape=(100,1), dtype=float)
+	addon = sp.csc_matrix( (data,indices,indptr), shape=(1,100), dtype=float)
+	iden = vstack([addon,iden])
+	indptr = [0,1]
+	indices = range(101)
+	data = [0] * 101
+
+	addon = sp.csc_matrix( (data,indices,indptr), shape=(101,1), dtype=float)
 	iden = hstack([addon,iden])
 	l = {}
-	for i in range(4,5):
+	for i in range(folding):
 		print "#############################Using ", i, "th folds#################################"
 		tuningData = folds[i]
 		tuningResult = foldsResult[i]
@@ -53,6 +69,20 @@ def crossVald(folding):
 				else:	
 					H = vstack([H,folds[j]])
 					t = numpy.concatenate((t,foldsResult[j]))
+		#add a columb 4000 * 1
+		row = range(5000 - mul)
+		col = [0] * (5000 - mul)
+		data = [1] * (5000 - mul)
+
+		addon = sp.csc_matrix( (data,(row,col)), shape=((5000-mul),1), dtype=float)
+		H = hstack([addon, H])
+		
+		row = range(mul)
+		col = [0] * mul
+		data = [1] * mul
+
+		addon = sp.csc_matrix( (data,(row,col)), shape=(mul,1), dtype=float)
+		tuningData = hstack([addon, tuningData])
 		#calculate w
 		lamda = 1.0
 		factor = 0.75
@@ -95,16 +125,23 @@ testResult = y[5000:]
 
 #add a column to the training data
 
-indptr = range(101)
-indices = [0]*100
-data = [1] * 100
+row = range(5000)
+col = [0] * 5000
+data = [1] * 5000
 
-addon = sp.csc_matrix( (data,indices,indptr), shape=(1,100), dtype=float)
+addon = sp.csc_matrix( (data,(row,col)), shape=(5000,1), dtype=float)
 trainingData = A[:5000]
-trainingData = vstack([trainingData,addon])
+trainingData = hstack([addon, trainingData])
 
 trainingResult = y[:5000]
-trainingResult = numpy.append(trainingResult,[1])
+# trainingResult = numpy.append(trainingResult,[1])
+#add a column to the test data
+row = range(1000)
+col = [0] * 1000
+data = [1] * 1000
+
+addon = sp.csc_matrix( (data,(row,col)), shape=(1000,1), dtype=float)
+testData = hstack([addon, testData])
 
 Ht = trainingData.transpose(True)
 a = Ht * trainingData
