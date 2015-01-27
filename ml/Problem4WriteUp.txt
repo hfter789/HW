@@ -15,3 +15,5 @@
 4)	Without cross-validation, the optimal lambda is 0.421875
 
 	RMSE for test set is 2.35994328475
+
+	Using a validation set instead of cross-validation would make the calculation faster because slicing, combining, and calculating matrices take time and cross-validation does them a lot. But the model produced by a validation set is not as accurate as cross-validation if we compare the RMSE.
