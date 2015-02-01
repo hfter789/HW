@@ -1,0 +1,19 @@
+1)
+	Training RMSE:  2.87631708961
+	Testing RMSE:  2.98110717687
+
+2)
+	The optimal lambda is 0.00751694681821. I add up all the RMSE of the same lambda for different folds. And the sum of the RMSE is the least when lambda is the above value.
+
+	RMSE for test set is 2.35387628041
+
+3)
+	The optimal lambda is 0.0422351360321 using the same procesure as above.
+
+	RMSE for test set is 2.3518483114
+
+4)	Without cross-validation, the optimal lambda is 0.421875
+
+	RMSE for test set is 2.35994328475
+
+	Using a validation set instead of cross-validation would make the calculation faster because slicing, combining, and calculating matrices take time and cross-validation does them a lot. But the model produced by a validation set is not as accurate as cross-validation if we compare the RMSE.
