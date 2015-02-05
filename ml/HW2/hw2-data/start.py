@@ -2,7 +2,7 @@
 from __future__ import division
 from numpy import *
 from math import *
-import time
+import pdb
 
 def calcWeight(ng, lamda, Y_train, X_train, dimension, iteration = 1):
 
@@ -12,38 +12,41 @@ def calcWeight(ng, lamda, Y_train, X_train, dimension, iteration = 1):
 		# figure out weight[0]
 		error = 0
 		for j in range(N):
-			error += Y_train[j] - weight.T.dot(X_train[j])
+			s = weight.T.dot(X_train[j])
+			error += Y_train[j] - exp(s)/(1+exp(s))
+		#pdb.set_trace()
 		weight[0] += error * ng / N
 
 		for j in range(1,dimension):
 			# v is the sum of xj(yj - P(Yj=1|xj,w))
 			v = 0
 			for k in range(N):
-				#don't dot with weight 0
-				# start = time.time()
-				# s = weight[0] + weight.T.dot(X_train[k])
 				s = weight.T.dot(X_train[k])
-				# end = time.time()
-				# print end - start
-				try:
-					# start = time.time()
-					v += X_train[k][j] * (Y_train[k] - 1/(1+exp(s)))
-					# end = time.time()
-					# print end - start
-				except:
-					print s
+				v += X_train[k][j] * (Y_train[k] - exp(s)/(1+exp(s)))
 				# print "s is", s
 				# print "v is", v
-
+			#pdb.set_trace()
 			weight[j] += ng * (-lamda*weight[j]+v/N)
 			# print "Weight at", j, " is", weight[j]
-		p = 1
-		for x in X_train:
-			p = p * 1/(1+exp(weight.T.dot(x)))
-		if p != 0:
-			print lamda / 2 * sum([w**2 for w in weight]) - log(p)/N
-		else:
-			print lamda / 2 * sum([w**2 for w in weight])
+		
+		#p = 1
+		#for x in X_train:
+		#	p = p * 1/(1+exp(weight.T.dot(x)))
+		#if p != 0:
+		#	print lamda / 2 * sum([w**2 for w in weight]) - log(p)/N
+		#else:
+		#	print lamda / 2 * sum([w**2 for w in weight])
+			count = 0
+		for i in range(len(Y_train)):
+			s = weight.T.dot(X_train[i])
+			prediction = exp(s)/(1+exp(s))
+			res = 0
+			if prediction > 0.5:
+				res = 1
+			if res == Y_train[i]:
+				count += 1
+		#print count
+		print "Prediction is",prediction, "Training Acc is ", float(count) / len(Y_train)
 
 	print weight
 	return weight
