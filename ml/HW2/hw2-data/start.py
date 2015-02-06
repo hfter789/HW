@@ -17,26 +17,11 @@ def calcWeight(ng, lamda, Y_train, X_train, dimension, iteration = 1):
 		#pdb.set_trace()
 		weight[0] += error * ng / N
 
-		for j in range(1,dimension):
-			# v is the sum of xj(yj - P(Yj=1|xj,w))
-			v = 0
-			for k in range(N):
-				s = weight.T.dot(X_train[k])
-				v += X_train[k][j] * (Y_train[k] - exp(s)/(1+exp(s)))
-				# print "s is", s
-				# print "v is", v
-			#pdb.set_trace()
-			weight[j] += ng * (-lamda*weight[j]+v/N)
-			# print "Weight at", j, " is", weight[j]
-		
-		#p = 1
-		#for x in X_train:
-		#	p = p * 1/(1+exp(weight.T.dot(x)))
-		#if p != 0:
-		#	print lamda / 2 * sum([w**2 for w in weight]) - log(p)/N
-		#else:
-		#	print lamda / 2 * sum([w**2 for w in weight])
-			count = 0
+		#this gives the overall dot product
+		val = dot(X_train.T ,(Y_train - dot(X_train,weight[1:].T)))/N
+		weight[1:] += ng * (-lamda*weight[1:] + val)
+
+		count = 0
 		for i in range(len(Y_train)):
 			s = weight.T.dot(X_train[i])
 			prediction = exp(s)/(1+exp(s))
@@ -45,8 +30,10 @@ def calcWeight(ng, lamda, Y_train, X_train, dimension, iteration = 1):
 				res = 1
 			if res == Y_train[i]:
 				count += 1
+
+			print "****P is",prediction, "and true result is", Y_train[i]
 		#print count
-		print "Prediction is",prediction, "Training Acc is ", float(count) / len(Y_train)
+		print "Training Acc is ", float(count) / len(Y_train)
 
 	print weight
 	return weight
@@ -57,7 +44,7 @@ def main():
 	X_train = training_data[:, 1:]
 	Y_test = genfromtxt('test_label.txt', delimiter=',')
 	X_test = genfromtxt('test.txt', delimiter=',')
-
+	#try not adding a column
 	#add a column of 1 to the training data
 	addon = array([1]*len(X_train)).reshape((len(X_train),1))
 	X_train = hstack((addon, X_train))
