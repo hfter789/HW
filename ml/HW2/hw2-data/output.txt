@@ -1,0 +1,5 @@
+0.38096974213
+0.3070579002
+Stop at Iteration 1
+Training Acc is  0.9547
+Testing Acc is  0.946
