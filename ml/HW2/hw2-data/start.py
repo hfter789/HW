@@ -39,21 +39,9 @@ def calcWeight(ng, lamda, Y_train, X_train, dimension, iteration = 1,step = -100
 			break
 		oll = ll
 
-		# count = 0
-		# pred = dot(X_train,weight)+weight0	
-		# for j in range(N):
-		# 	pred[j] = 1-1/(1+exp(pred[j]))
-		# 	result = 1
-		# 	if pred[j] <= 0.5:
-		# 		result = 0
-		# 	if result == Y_train[j]:
-		# 		count += 1
-		# print "Training Acc is ", float(count) / len(Y_train)
-
-	# print weight
 	return weight,weight0
 
-def perceptron(ng,X_train,Y_train,dimension,accuracy):
+def perceptron(X_train,Y_train,dimension,accuracy):
 	step = 1
 	N = len(Y_train)
 	weight = array([0.0]*dimension)
@@ -63,12 +51,15 @@ def perceptron(ng,X_train,Y_train,dimension,accuracy):
 	try:
 		while True:
 			for j in range(N):
+				#use the weight to dot with the training data to make a prediction
 				pred = dot (X_train[j],weight)+weight0
+				#predict 1 if the prediction is greater than 0
+				#predict 0 if the prediction is less than or equal to 0
 				if pred > 0:
 					pred = 1
 				else:
 					pred = -1
-
+				#check if prediction matches the result
 				if pred != Y_train[j]:
 					weight += step * (Y_train[j]*X_train[j])
 					weight0 += step * (Y_train[j])
@@ -105,8 +96,8 @@ def perceptron(ng,X_train,Y_train,dimension,accuracy):
 	return weight,weight0,o,z,best
 
 def main():
-	training_data = genfromtxt('train.txt', delimiter=',')
-	# training_data = genfromtxt('oversampled_train.txt', delimiter=',')
+	# training_data = genfromtxt('train.txt', delimiter=',')
+	training_data = genfromtxt('oversampled_train.txt', delimiter=',')
 	Y_train = training_data[:,0]
 	X_train = training_data[:, 1:]
 	Y_test = genfromtxt('test_label.txt', delimiter=',')
@@ -122,7 +113,7 @@ def main():
 	"""
 
 	# print "lambda 0 ll is", sum([w**2 for w in weight])
-	weight,weight0 = calcWeight(ng,0.3,Y_train,X_train,54,1000)
+	# weight,weight0 = calcWeight(ng,0.3,Y_train,X_train,54,1000)
 
 
 	# print "lambda 0.3 ll is", sum([w**2 for w in weight])
@@ -151,10 +142,10 @@ def main():
 
 	# print float(total)/N,"(+",zero[0],",-",zero[1], ")"," (-",one[0],",+",one[1], ")"
 	# """
-	# for i in range(N):
-	# 	if(Y_train[i]) == 0:
-	# 		Y_train[i] = -1
-	# weight,weight0 = perceptron(0.1,X_train,Y_train,54,accuracy=.80)
+	for i in range(N):
+		if(Y_train[i]) == 0:
+			Y_train[i] = -1
+	weight,weight0 = perceptron(X_train,Y_train,54,accuracy=.80)
 	
 	# """
 
