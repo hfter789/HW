@@ -1,0 +1,50 @@
+Problem 1
+1)	Let P(B) be probability of Bronchitis, P(T) be probability of Tuberculosis
+	P(X) be probability of X-ray Shadow, P(D) be probability of Dyspnea
+	P(L) be probability of Lung Inflammation
+
+	P(B) = 1/2,	Number of Bronchitis / Total Number of Samples
+	P(T) = 1/2,	Number of Tuberculosis / Total Number of Samples
+	P(X|B) = 2/3,	Number of X-ray Shadow / Total Number of Bronchitis
+	P(D|B) = 2/3,	Number of Dyspnea / Total Number of Bronchitis	
+	P(L|B) = 1,	Number of Lung inflammation / Total Number of Bronchitis
+	P(X|T) 2/3,	Number of X-ray Shadow / Total Number of Tuberculosis
+	P(D|T) = 1/3,	Number of Dyspnea / Total Number of Tuberculosis
+	P(L|T) = 1/3,	Number of Lung inflammation / Total Number of Tuberculosis
+
+2)	P(B|X,-D,L) = P(B)P(X|B)P(-D|B)P(L|B) = 1/2 * 2/3 * 1/3 * 1 = 1/9 => 60%
+	P(T|X,-D,L) = P(T)P(X|T)P(-D|T)P(L|T) = 1/2 * 2/3 * 2/3 * 1/3 = 2/27 => 40%
+
+3)	Yes. An overfitting situation in Naive Bayes is having 0/1 probability. P(-L|B) = 0,
+	which means no matter how likely Bronchitis is likely to occurs given the previous
+	evidence, multiplying by an outlier P(-L|B) would ruin everything.
+
+Problem 2
+1)
+2)
+	a)
+	b)Accuracy 94.6%
+3)
+	a)12
+	b)
+	c)
+
+Problem 3
+1) 	For 0: Precision = 100%, Recall = .81%
+	For 1: Precision = 46.35% Recall = 100%
+
+2)	I used a accuracy upper bound of 99% and 80%, when the prediction reaches the upper bound, the loop will stop. However, the accuracy doesn't go higher than 50% in 1000 Iterations.
+
+3)	Based on observation, I don't see the prediction becomes better. Therefore, It probably doesn't converge. However, this is just a guess, we cannot tell for sure.
+
+4)					Logistic Regression									Perceptron
+
+RunTime				Faster because matrix algebra					Slower because have to iterate 						through all samples on the 						through the samples one by one
+					is fast
+
+Accuracy			More Accurate prediction						Less Accurate
+					
+complexity			Harder											Simple
+of Implementation
+
+Perceptron is my favorite because it is easy to understand and easy to implement.

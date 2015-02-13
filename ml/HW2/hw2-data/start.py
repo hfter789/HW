@@ -53,36 +53,77 @@ def calcWeight(ng, lamda, Y_train, X_train, dimension, iteration = 1,step = -100
 	# print weight
 	return weight,weight0
 
-def perceptron(ng,X_train,Y_train,dimension,iteration = 1):
+def perceptron(ng,X_train,Y_train,dimension,accuracy):
+	step = 1
 	N = len(Y_train)
 	weight = array([0.0]*dimension)
-	for i in range(iteration):
-		for j in range(N):
-			pred = dot (X_train[j],weight)
-			if pred > 0:
-				pred = 1
-			else:
-				pred = 0
+	weight0 = 0
+	best = 0
+	o = z = None
+	try:
+		while True:
+			for j in range(N):
+				pred = dot (X_train[j],weight)+weight0
+				if pred > 0:
+					pred = 1
+				else:
+					pred = -1
 
-	return weight
+				if pred != Y_train[j]:
+					weight += step * (Y_train[j]*X_train[j])
+					weight0 += step * (Y_train[j])
+
+			total = 0
+			#left is true zero, right is true one
+			one = (0,0)
+			zero = (0,0)
+			for j in range(N):
+				pred = dot(X_train[j],weight)+weight0
+				if pred > 0:
+					if Y_train[j] == -1:
+						one = (one[0]+1,one[1])
+					else:
+						one = (one[0],one[1]+1)
+						total+=1
+				else:
+					if Y_train[j] == -1:
+						zero = (zero[0]+1, zero[1])
+						total+=1
+					else:
+						zero = (zero[0], zero[1]+1)
+			acc = float(total)/N
+			if acc > best:
+				best = acc
+				o = one
+				z = zero
+			print acc,"(+",zero[0],",-",zero[1], ")"," (-",one[0],",+",one[1], ")"
+			if acc > accuracy:
+				print "Reaches accuracy", accuracy*100, "%"
+				break
+	except:
+		print "BEST",best,"(+",z[0],",-",z[1], ")"," (-",o[0],",+",o[1], ")"
+	return weight,weight0,o,z,best
 
 def main():
-	# training_data = genfromtxt('train.txt', delimiter=',')
-	training_data = genfromtxt('oversampled_train.txt', delimiter=',')
+	training_data = genfromtxt('train.txt', delimiter=',')
+	# training_data = genfromtxt('oversampled_train.txt', delimiter=',')
 	Y_train = training_data[:,0]
 	X_train = training_data[:, 1:]
 	Y_test = genfromtxt('test_label.txt', delimiter=',')
 	X_test = genfromtxt('test.txt', delimiter=',')
 	N = len(Y_train)
 	# clicks = (Y_test == 1).sum()
-	# ng = 0.1
-	# lamda = 0.3
-	# weight,weight0 = calcWeight(ng,lamda,Y_train,X_train,54,1000,0.0005)
-	# weight,weight0 = calcWeight(ng,0,Y_train,X_train,54,1000)
+	ng = 0.1
+	lamda = 0.3
+	"""
+	weight,weight0 = calcWeight(ng,lamda,Y_train,X_train,54,1000,0.0005)
+	weight,weight0 = calcWeight(ng,0.3,Y_train,X_train,54,1000)
+	# print weight0,weight
+	"""
 
 	# print "lambda 0 ll is", sum([w**2 for w in weight])
+	weight,weight0 = calcWeight(ng,0.3,Y_train,X_train,54,1000)
 
-	# weight,weight0 = calcWeight(ng,0.3,Y_train,X_train,54,1000)
 
 	# print "lambda 0.3 ll is", sum([w**2 for w in weight])
 
@@ -100,20 +141,22 @@ def main():
 	# 			one = (one[0]+1,one[1])
 	# 		else:
 	# 			one = (one[0],one[1]+1)
+	# 			total += 1
 	# 	else:
 	# 		if Y_test[j] == 0:
 	# 			zero = (zero[0]+1, zero[1])
+	# 			total += 1
 	# 		else:
 	# 			zero = (zero[0], zero[1]+1)
 
-	# print "One", one
-	# print "Zero", zero
-	for i in range(N):
-		if(Y_train[i]) == 0:
-			Y_train[i] = -1
-
-	weight = perceptron(0.1,X_train,Y_train,54,1000)
-
+	# print float(total)/N,"(+",zero[0],",-",zero[1], ")"," (-",one[0],",+",one[1], ")"
+	# """
+	# for i in range(N):
+	# 	if(Y_train[i]) == 0:
+	# 		Y_train[i] = -1
+	# weight,weight0 = perceptron(0.1,X_train,Y_train,54,accuracy=.80)
+	
+	# """
 
 	# count = 0
 	# pred = dot(X_train,weight)+weight0	
