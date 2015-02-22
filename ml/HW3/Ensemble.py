@@ -3,6 +3,7 @@ from sklearn.externals.six import StringIO
 import string
 import pydot 
 import random
+import numpy
 
 # X = [[0, 0], [1, 1],[1,0],[0,1]]
 # X = [[0, 0,1], [1, 1,0],[1,0,0],[0,1,1], [2, 1,0],[1,0,3],[0,6,1]]
@@ -58,7 +59,7 @@ def Bagging(X_train,Y_train,X_test, Y_test, sampleSize, Iteration = 50, depth = 
 	N = len(X_train)
 	# classifiers = []
 	#recording the prediction instead of the classifier since we only need to predict test data
-	predictions = [0] * len(Y_test)
+	predictions = numpy.array([0]*len(Y_test))
 	for i in range(Iteration):
 		X_Sample = []
 		Y_Sample = []
@@ -71,20 +72,33 @@ def Bagging(X_train,Y_train,X_test, Y_test, sampleSize, Iteration = 50, depth = 
 		# classifiers.append(clf)
 		#Now do the prediction with clf
 		Y_Predict = clf.predict(X_test)
+		#summing up the votes since the old votes stay the same
+		#no need to do the calculation everytime
 		predictions +=Y_Predict
-		M = len(predictions)
 		errorCount = 0
 		for j in range(len(Y_test)):
-			if Y_Predict[j] != Y_test[j]:
+			vote = predictions[j]/float(i+1)
+			pred = 1 if vote > 0.5 else 0
+			if pred != Y_test[j]:
 				errorCount += 1
 		print float(errorCount)/len(Y_test) 
-
-	return classifiers
+#M is the sample size
+#N is the range
+#In English, sample M items from N items with replacement
+def sampleExperiment(M,N,Iteration = 50):
+	for i in range(Iteration):
+		a = set()
+		for j in range(M):
+			k = random.randint(0,N-1)
+			a.add(k)
+		print len(a)/float(N)
 
 def main():
 	X_train,Y_train = ParseFile('training.txt')
 	X_test,Y_test = ParseFile('test.txt')
-	Bagging(X_train,Y_train, X_test, Y_test,sampleSize = 60, Iteration = 100)
+	# Bagging(X_train,Y_train, X_test, Y_test,60,Iteration = 100)
+	# Bagging(X_train,Y_train, X_test, Y_test,60,Iteration = 100,depth = 2)
+	# sampleExperiment(len(X_train),len(X_train),Iteration = 100)
 
 if __name__ == '__main__':
 	main()
