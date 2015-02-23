@@ -1,5 +1,6 @@
 from sklearn import tree
-from sklearn.externals.six import StringIO  
+from sklearn.externals.six import StringIO 
+from math import * 
 import string
 import pydot 
 import random
@@ -55,7 +56,7 @@ def ParseFile(name):
 
 	return X,Y
 
-def Bagging(X_train,Y_train,X_test, Y_test, sampleSize, Iteration = 50, depth = 1, printError = True):
+def Bagging(X_train,Y_train,X_test, Y_test, sampleSize, Iteration = 50, depth = 1):
 	N = len(X_train)
 	# classifiers = []
 	#recording the prediction instead of the classifier since we only need to predict test data
@@ -82,6 +83,59 @@ def Bagging(X_train,Y_train,X_test, Y_test, sampleSize, Iteration = 50, depth = 
 			if pred != Y_test[j]:
 				errorCount += 1
 		print float(errorCount)/len(Y_test) 
+
+def AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 50, depth = 1):
+	N = len(X_train)
+	predictions = numpy.array([0]*len(Y_test))
+	trainingPred = numpy.array([0]*len(Y_train))
+	#initialize data weight D
+	D = numpy.array([float(1)/N]*N)
+	# for i in range(Iteration):
+	while True:
+		#train data
+		clf = tree.DecisionTreeClassifier(criterion = 'entropy', max_depth = depth)
+		clf = clf.fit(X_train,Y_train,sample_weight=D)
+		#calculate error
+		pred = clf.predict(X_train)
+		error = 0.0
+		for j in range(N):
+			if pred[j] != Y_train[j]:
+				error += D[j]
+		alpha = log((1-error)/error)/2
+		#update weight
+		for j in range(N):
+			D[j] =D[j] * exp(-alpha*Y_train[j]*pred[j])
+
+		#normalize
+		s = sum(D)
+		for j in range(N):
+			D[j] = D[j] / s
+		#now make a prediction base on data
+		#==================================TRAIN==============================#
+		pred = clf.predict(X_train)
+		trainingPred = trainingPred + pred * alpha
+		trainErrorCount = 0
+		#check error
+		for j in range(N):
+			p = -1
+			if trainingPred[j] > 0:
+				p = 1
+			if p != Y_train[j]:
+				trainErrorCount+=1
+		#==================================TEST==============================#
+		pred = clf.predict(X_test)
+		predictions = predictions + pred * alpha
+		errorCount = 0
+		#check error
+		for j in range(len(Y_test)):
+			p = -1
+			if predictions[j] > 0:
+				p = 1
+			if p != Y_test[j]:
+				errorCount+=1
+		print float(trainErrorCount) / N , float(errorCount) / len(Y_test), float(trainErrorCount)/N - float(errorCount)/len(Y_test)
+		# print float(errorCount) / len(Y_test)
+
 #M is the sample size
 #N is the range
 #In English, sample M items from N items with replacement
@@ -99,6 +153,16 @@ def main():
 	# Bagging(X_train,Y_train, X_test, Y_test,60,Iteration = 100)
 	# Bagging(X_train,Y_train, X_test, Y_test,60,Iteration = 100,depth = 2)
 	# sampleExperiment(len(X_train),len(X_train),Iteration = 100)
+
+	for i in range(len(Y_train)):
+		if Y_train[i] == 0:
+			Y_train[i] = -1
+
+	for i in range(len(Y_test)):
+		if Y_test[i] == 0:
+			Y_test[i] = -1 
+	AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 100,depth = 2)
+
 
 if __name__ == '__main__':
 	main()
