@@ -161,7 +161,7 @@ def main():
 	for i in range(len(Y_test)):
 		if Y_test[i] == 0:
 			Y_test[i] = -1 
-	AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 100,depth = 2)
+	AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 100)
 
 
 if __name__ == '__main__':
