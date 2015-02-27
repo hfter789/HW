@@ -1,8 +1,6 @@
 from sklearn import tree
-from sklearn.externals.six import StringIO 
 from math import * 
 import string
-import pydot 
 import random
 import numpy
 
@@ -91,7 +89,7 @@ def AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 50, depth = 1):
 	#initialize data weight D
 	D = numpy.array([float(1)/N]*N)
 	# for i in range(Iteration):
-	while True:
+	for i in range(Iteration):
 		#train data
 		clf = tree.DecisionTreeClassifier(criterion = 'entropy', max_depth = depth)
 		clf = clf.fit(X_train,Y_train,sample_weight=D)
@@ -133,7 +131,7 @@ def AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 50, depth = 1):
 				p = 1
 			if p != Y_test[j]:
 				errorCount+=1
-		print float(trainErrorCount) / N , float(errorCount) / len(Y_test), float(trainErrorCount)/N - float(errorCount)/len(Y_test)
+		print float(trainErrorCount) / N , ",", float(errorCount) / len(Y_test),",", float(trainErrorCount)/N - float(errorCount)/len(Y_test)
 		# print float(errorCount) / len(Y_test)
 
 #M is the sample size
@@ -161,7 +159,9 @@ def main():
 	for i in range(len(Y_test)):
 		if Y_test[i] == 0:
 			Y_test[i] = -1 
-	AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 100)
+
+	AdaBoost(X_train,Y_train,X_test,Y_test,Iteration = 200,depth = 2)
+
 
 
 if __name__ == '__main__':
