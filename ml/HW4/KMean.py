@@ -32,7 +32,7 @@ def KMean(X,Y,K,Iterations=20,randomStart = False):
 			groups[minIndex].append(j)
 		#check convergence
 		if groups == oldGroups:
-			print "Converged at Iteration", i
+			# print "Converged at Iteration", i
 			# print groups
 			break
 		oldGroups = groups
@@ -51,12 +51,12 @@ def KMean(X,Y,K,Iterations=20,randomStart = False):
 	# if K != 10:
 	# 	return
 	#calc Sum of square
+	ss = 0
 	for k in range(K):
-		ss = 0
 		for j in oldGroups[k]:
 			ss += numpy.linalg.norm(X[j]-centers[k])**2
-		print "Sum of square for cluster", k, ss
 	#use oldGroup to to calculate mistake rate
+	mistakeCount = 0
 	for k in range(K):
 		count = [0] * 10
 		data = oldGroups[k]
@@ -68,8 +68,9 @@ def KMean(X,Y,K,Iterations=20,randomStart = False):
 			if count[i] > maxCount:
 				maxCount = count[i]
 				predIndex = i
-		print "Cluster", k, "Prediction digit is", predIndex, "with accuracy", maxCount/float(len(data))
-
+		mistakeCount += (len(data)-maxCount)
+		# print "Cluster", k, "Prediction digit is", predIndex, "with accuracy", maxCount/float(len(data))
+	print K,ss,float(mistakeCount)/len(X)
 
 if __name__ == '__main__':
 	X=numpy.genfromtxt('digit.txt')
@@ -77,8 +78,9 @@ if __name__ == '__main__':
 	# X = numpy.array([[-1,0],[0,0],[2,2]])
 	# KMean(X,Y,2)
 	# KMean(X,Y,4)
-	KMean(X,Y,6)
-	# KMean(X,Y,10,randomStart=True)
+	# KMean(X,Y,6)
+	for i in range(1,11):
+		KMean(X,Y,i,randomStart=True)
 	# cluster = KMeans(n_clusters=6,max_iter=20)
 	# cluster = cluster.fit(X)
 	# print cluster.score(X)

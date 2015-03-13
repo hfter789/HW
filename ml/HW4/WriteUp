@@ -1,11 +1,3 @@
-3.5.1
+\prod_{j}\sum_{i=1}^{k}\frac{1}{\sqrt{(2\pi)^{m}\left | \sum_{i} \right |)}}exp(-\frac{1}{2}(x^{j}-\mu_i)^{T}(\sum_{i})^{-1}(x^{j}-\mu_i))p_i
 
-Sum of square for cluster 0 75269667.8857
-Sum of square for cluster 1 42761918.8889
-Sum of square for cluster 2 126321953.551
-Sum of square for cluster 3 35728424.4173
-Sum of square for cluster 4 96570226.7368
-Sum of square for cluster 5 54696991.4369
-
-3.5.2
-Iterations 8. 
+P(y=c|x^{i})\alpha\frac{1}{\sqrt{(2\pi)^{3}\left | \sum_{c} \right |)}}exp(-\frac{1}{2}(x^{j}-\mu_c)^{T}(\sum_{c})^{-1}(x^{j}-\mu_c))p_c
