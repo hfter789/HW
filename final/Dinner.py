@@ -86,6 +86,8 @@ def main():
 			if rec[key] > k:
 				k = rec[key]
 				pref = key
+		if len(rec) == 0:
+			continue
 		round += 1
 		rec = {}
 		if round == ROUND:
