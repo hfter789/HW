@@ -1,6 +1,7 @@
 import socket
 from sys import *
 import base64
+import threading
 
 BUF_SIZE = 8
 ROUND = 10
@@ -18,7 +19,8 @@ def getGroups(fileName):
 	for l in content:
 		l = l.strip('\n')
 		tokens = l.split()
-		group.append((tokens[0],int(tokens[1])))
+		if len(tokens) == 2:
+			group.append((tokens[0],int(tokens[1])))
 	return group
 # helper
 def intToBytes(num, numOfBytes):
@@ -44,6 +46,29 @@ def makeMsg(cmd, k):
 # 			rec[data] = 1
 # 	elif cmd == CMD['REQ']:
 
+def receiver(sock, mypref):
+	while True:
+		try:
+			data, addr = sock.recvfrom(BUF_SIZE)
+		except socket.timeout:
+			continue
+		except:
+			#error
+			return
+		cmd = int(data[:4].encode('hex'),base=16)
+		pref = int(data[4:].encode('hex'),base=16)
+		if cmd == CMD['REQ']:
+			if pref != mypref:
+				sock.sendto(makeMsg(CMD['NAK'],mypref),addr)
+
+#keep sending my selected slot to everyone
+def sender(sock, group, mypref):
+	while True:
+		for addr in group:
+			try:
+				sock.sendto(makeMsg(CMD['PIK'],mypref), addr)
+			except:
+				return
 
 def main():
 	fileName = argv[1]
@@ -80,6 +105,7 @@ def main():
 				k = rec[key]
 				pref = key
 		round += 1
+		rec = {}
 		print "Round", round, "Pref", pref
 		if round == ROUND:
 			#Do a REQ
@@ -99,20 +125,35 @@ def main():
 					continue
 	print pref
 	mypref = pref
+	#after printing my time, I will keep sending my pref to everyone
+	#so take over their rec map
+	#if I receive a REQ of a pref number that's not equal to mine, I NAK(refuse) it
+	t = threading.Thread(target = receiver, args = (sock,mypref))
+	t.setDaemon(True)
+	t.start()
+	t = threading.Thread(target = sender, args = [sock,group,mypref])
+	t.setDaemon(True)
+	t.start()
 	while True:
-		for addr in group:
-			sock.sendto(makeMsg(CMD['REQ'],pref), addr)
-		for _ in range(N):
-			try:
-				data, addr = sock.recvfrom(BUF_SIZE)
-			except socket.timeout:
-				break
-			# recordData(rec,data)
-			cmd = int(data[:4].encode('hex'),base=16)
-			pref = int(data[4:].encode('hex'),base=16)
-			if cmd == CMD['REQ']:
-				if pref != mypref:
-					sock.sendto(makeMsg(CMD['NAK'],pref),addr)
+		pass
+		# for addr in group:
+		# 	sock.sendto(makeMsg(CMD['PIK'],pref), addr)
+		# for _ in range(N):
+		# 	try:
+		# 		data, addr = sock.recvfrom(BUF_SIZE)
+		# 	except socket.timeout:
+		# 		break
+		# 	# recordData(rec,data)
+		# 	cmd = int(data[:4].encode('hex'),base=16)
+		# 	pref = int(data[4:].encode('hex'),base=16)
+		# 	if cmd == CMD['REQ']:
+		# 		if pref != mypref:
+		# 			sock.sendto(makeMsg(CMD['NAK'],mypref),addr)
+		# 		else: 
+		# 			try:
+		# 				group.remove(addr)
+		# 			except:
+		# 				pass
 
 
 if __name__ == '__main__':

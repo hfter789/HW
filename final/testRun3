@@ -1,3 +1,3 @@
 #/bin/bash
 
-python Dinner.py groupFile3.txt 3333 1900
+python Dinner.py groupFile3.txt 3333 3333
