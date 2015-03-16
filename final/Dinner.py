@@ -31,20 +31,10 @@ def intToBytes(num, numOfBytes):
   try:
     return base64.b16decode(hex(num)[2:].zfill(numOfBytes*2),True)
   except :
-    print "Cannot Convert", num
+  	pass
 
 def makeMsg(cmd, k):
 	return intToBytes(cmd, 4)+intToBytes(k,4)
-
-# def recordData(rec,data):
-# 	cmd = int(data[:4],base=16)
-# 	pref = int(data[4:],base=16)
-# 	if cmd == CMD['PIK']:
-# 		if data in rec:
-# 			rec[data] += 1
-# 		else:
-# 			rec[data] = 1
-# 	elif cmd == CMD['REQ']:
 
 def receiver(sock, mypref):
 	while True:
@@ -61,14 +51,6 @@ def receiver(sock, mypref):
 			if pref != mypref:
 				sock.sendto(makeMsg(CMD['NAK'],mypref),addr)
 
-#keep sending my selected slot to everyone
-def sender(sock, group, mypref):
-	while True:
-		for addr in group:
-			try:
-				sock.sendto(makeMsg(CMD['PIK'],mypref), addr)
-			except:
-				return
 
 def main():
 	fileName = argv[1]
@@ -106,7 +88,6 @@ def main():
 				pref = key
 		round += 1
 		rec = {}
-		print "Round", round, "Pref", pref
 		if round == ROUND:
 			#Do a REQ
 			for addr in group:
@@ -120,7 +101,7 @@ def main():
 				pref = int(data[4:].encode('hex'),base=16)
 				#if there is a NAK, redo the selection again
 				if cmd == CMD['NAK']:
-					print "Got a NAK"
+					# print "Got a NAK"
 					round = 0
 					continue
 	print pref
@@ -131,29 +112,12 @@ def main():
 	t = threading.Thread(target = receiver, args = (sock,mypref))
 	t.setDaemon(True)
 	t.start()
-	t = threading.Thread(target = sender, args = [sock,group,mypref])
-	t.setDaemon(True)
-	t.start()
 	while True:
-		pass
-		# for addr in group:
-		# 	sock.sendto(makeMsg(CMD['PIK'],pref), addr)
-		# for _ in range(N):
-		# 	try:
-		# 		data, addr = sock.recvfrom(BUF_SIZE)
-		# 	except socket.timeout:
-		# 		break
-		# 	# recordData(rec,data)
-		# 	cmd = int(data[:4].encode('hex'),base=16)
-		# 	pref = int(data[4:].encode('hex'),base=16)
-		# 	if cmd == CMD['REQ']:
-		# 		if pref != mypref:
-		# 			sock.sendto(makeMsg(CMD['NAK'],mypref),addr)
-		# 		else: 
-		# 			try:
-		# 				group.remove(addr)
-		# 			except:
-		# 				pass
+		for addr in group:
+			try:
+				sock.sendto(makeMsg(CMD['PIK'],mypref), addr)
+			except:
+				return
 
 
 if __name__ == '__main__':
