@@ -1,0 +1,3 @@
+#/bin/bash
+
+python Dinner.py groupFile2.txt 2222 1800
