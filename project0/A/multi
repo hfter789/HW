@@ -1,0 +1,12 @@
+#!/bin/bash
+./client localhost 3333 <Dostoyevsky.txt  &
+./client localhost 3333 <1.txt &
+./client localhost 3333 <2.txt &
+./client localhost 3333 <3.txt &
+./client localhost 3333 <4.txt &
+./client localhost 3333 <5.txt &
+./client localhost 3333 <5.txt &
+./client localhost 3333 <6.txt &
+./client localhost 3333 <7.txt &
+./client localhost 3333 <8.txt &
+./client localhost 3333 <9.txt
